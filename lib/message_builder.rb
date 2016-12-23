@@ -69,9 +69,9 @@ class MessageBuilder
     @content.sample
   end
 
-  def comments(pull_request)
-    return " comment" if @content[pull_request]["comments_count"] == "1"
-    " comments"
+  def comments(pr)
+    return "1 comment" if pr["comments_count"] == "1"
+    "#{pr["comments_count"]} comments"
   end
 
   def these(items)
@@ -92,19 +92,15 @@ class MessageBuilder
 
   def present(pull_request, index)
     pr = @content[pull_request]
-    days = age_in_days(pr)
-    thumbs_up = ''
-    thumbs_up = " | #{pr["thumbs_up"].to_i} :+1:" if pr["thumbs_up"].to_i > 0
+
     <<-EOF.gsub(/^\s+/, '')
-    #{index}\) *#{escape_for_slack(pr["repo"])}* | #{escape_for_slack(pr["author"])} | updated #{days_plural(days)}#{thumbs_up}
-    #{labels(pr)} <#{escape_for_slack(pr["link"])}|#{escape_for_slack(pr["title"])}> - #{pr["comments_count"]}#{comments(pull_request)}
+    #{index}\) *#{escaped_repo(pr)}* | #{escaped_author(pr)} | updated #{when_updated(pr)}#{thumbs_up(pr)}
+    #{labels(pr)} <#{escaped_link(pr)}|#{escaped_title(pr)}> - #{comments(pr)}
     EOF
   end
 
-  def escape_for_slack(text)
-    text.gsub("&", "&amp;")
-        .gsub("<", "&lt;")
-        .gsub(">", "&gt;")
+  def when_updated(pr)
+    days_plural(age_in_days(pr))
   end
 
   def age_in_days(pull_request)
@@ -124,7 +120,41 @@ class MessageBuilder
 
   def labels(pull_request)
     pull_request['labels']
-      .map { |label| "[#{escape_for_slack(label['name'])}]" }
+      .map { |label| "[#{escaped_label(label)}]" }
       .join(' ')
+  end
+
+  def thumbs_up(pr)
+    if pr["thumbs_up"].to_i > 0
+      " | #{pr["thumbs_up"].to_i} :+1:"
+    else
+      ""
+    end
+  end
+
+  def escaped_author(pr)
+    escape_for_slack(pr["author"])
+  end
+
+  def escaped_label(label)
+    escape_for_slack(label['name'])
+  end
+
+  def escaped_link(pr)
+    escape_for_slack(pr["link"])
+  end
+
+  def escaped_repo(pr)
+    escape_for_slack(pr["repo"])
+  end
+
+  def escaped_title(pr)
+    escape_for_slack(pr["title"])
+  end
+
+  def escape_for_slack(text)
+    text.gsub("&", "&amp;")
+        .gsub("<", "&lt;")
+        .gsub(">", "&gt;")
   end
 end
