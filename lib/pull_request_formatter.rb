@@ -1,6 +1,18 @@
 class PullRequestFormatter
   attr_reader :pull_request
 
+  [:comments_count, :thumbs_up_count].each do |field|
+    define_method(field) do
+      pull_request[field.to_s].to_i
+    end
+  end
+
+  [:author, :link, :repo, :title].each do |field|
+    define_method(field) do
+      escaped_property(field.to_s)
+    end
+  end
+
   def initialize(pull_request, index)
     @pull_request = pull_request
     @index = index
@@ -8,20 +20,34 @@ class PullRequestFormatter
 
   def present
     <<-EOF.gsub(/^\s+/, '')
-    #{@index + 1}\) *#{repo}* | #{author} | updated #{when_updated}#{thumbs_up}
-    #{labels} <#{link}|#{title}> - #{comments}
+    #{@index + 1}\) *#{repo}* | #{author} | updated #{when_updated}#{format_thumbs_up}
+    #{format_labels} <#{link}|#{title}> - #{format_comments}
     EOF
   end
 
 private
 
-  def comments_count
-    pull_request["comments_count"].to_i
-  end
-
-  def comments
+  def format_comments
     return "1 comment" if comments_count == 1
     "#{comments_count} comments"
+  end
+
+  def format_labels
+    labels.map { |label| "[#{label}]" }
+      .join(' ')
+  end
+
+  def labels
+    pull_request['labels']
+      .map { |label| "#{escape(label['name'])}" }
+  end
+
+  def format_thumbs_up
+    if thumbs_up_count > 0
+      " | #{thumbs_up_count} :+1:"
+    else
+      ""
+    end
   end
 
   def when_updated
@@ -40,45 +66,11 @@ private
     end
   end
 
-  def labels
-    pull_request['labels']
-      .map { |label| "[#{format_label(label)}]" }
-      .join(' ')
+  def escaped_property(key)
+    escape(pull_request[key])
   end
 
-  def format_label(label)
-    escape_for_slack(label['name'])
-  end
-
-  def thumbs_up_count
-    pull_request["thumbs_up_count"].to_i
-  end
-
-  def thumbs_up
-    if thumbs_up_count > 0
-      " | #{thumbs_up_count} :+1:"
-    else
-      ""
-    end
-  end
-
-  def author
-    escape_for_slack(pull_request["author"])
-  end
-
-  def link
-    escape_for_slack(pull_request["link"])
-  end
-
-  def repo
-    escape_for_slack(pull_request["repo"])
-  end
-
-  def title
-    escape_for_slack(pull_request["title"])
-  end
-
-  def escape_for_slack(text)
+  def escape(text)
     text.gsub("&", "&amp;")
         .gsub("<", "&lt;")
         .gsub(">", "&gt;")
