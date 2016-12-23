@@ -38,7 +38,7 @@ describe 'GithubFetcher' do
           'author' => 'mattbostock',
           'repo' => 'whitehall',
           'comments_count' => '1',
-          'thumbs_up' => '1',
+          'thumbs_up_count' => '1',
           'updated' => Date.parse('2015-07-13 ((2457217j,0s,0n),+0s,2299161j)'),
           'labels' => []
         },
@@ -50,7 +50,7 @@ describe 'GithubFetcher' do
           'author' => 'tekin',
           'repo' => 'whitehall-rebuild',
           'comments_count' => '5',
-          'thumbs_up' => '0',
+          'thumbs_up_count' => '0',
           'updated' => Date.parse('2015-07-17 ((2457221j,0s,0n),+0s,2299161j)'),
           'labels' => []
         }

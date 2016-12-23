@@ -36,7 +36,7 @@ class GithubFetcher
     pr['author'] = pull_request.user.login
     pr['repo'] = repo_name
     pr['comments_count'] = count_comments(pull_request, repo_name)
-    pr['thumbs_up'] = count_thumbs_up(pull_request, repo_name)
+    pr['thumbs_up_count'] = count_thumbs_up(pull_request, repo_name)
     pr['updated'] = Date.parse(pull_request.updated_at.to_s)
     pr['labels'] = labels(pull_request, repo_name)
     pr

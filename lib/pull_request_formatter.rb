@@ -51,7 +51,7 @@ private
   end
 
   def thumbs_up_count
-    pull_request["thumbs_up"].to_i
+    pull_request["thumbs_up_count"].to_i
   end
 
   def thumbs_up

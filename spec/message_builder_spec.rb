@@ -13,7 +13,7 @@ describe MessageBuilder do
         'author' => 'tekin',
         'repo' => 'whitehall',
         'comments_count' => '5',
-        'thumbs_up' => '0',
+        'thumbs_up_count' => '0',
         'updated' => Date.parse('2015-07-17 ((2457221j, 0s, 0n), +0s, 2299161j)'),
         'labels' => []
       }
@@ -28,7 +28,7 @@ describe MessageBuilder do
         'author' => 'mattbostock',
         'repo' => 'whitehall',
         'comments_count' => '1',
-        'thumbs_up' => '1',
+        'thumbs_up_count' => '1',
         'updated' => Date.parse('2015-07-13 ((2457217j, 0s, 0n), +0s, 2299161j)'),
         'labels' => []
       },
@@ -38,7 +38,7 @@ describe MessageBuilder do
         'author' => 'tekin',
         'repo' => 'whitehall',
         'comments_count' => '5',
-        'thumbs_up' => '0',
+        'thumbs_up_count' => '0',
         'updated' => Date.parse('2015-07-17 ((2457221j, 0s, 0n), +0s, 2299161j)'),
         'labels' => []
       }
@@ -57,7 +57,7 @@ describe MessageBuilder do
           'author' => 'Agatha Christie',
           'repo' => 'repo',
           'comments_count' => '0',
-          'thumbs_up' => '0',
+          'thumbs_up_count' => '0',
           'updated' => Date.today,
           'labels' => [
             { 'name' => 'wip' },
@@ -126,7 +126,7 @@ describe MessageBuilder do
 
   context 'rotting' do
     let(:pull_request) do
-      { 'title' => '[FOR DISCUSSION ONLY] Remove Whitehall.case_study_preview_host', 'link' => 'https://github.com/alphagov/whitehall/pull/2266', 'author' => 'mattbostock', 'repo' => 'whitehall', 'comments_count' => '1', 'thumbs_up' => '0', 'updated' => Date.parse('2015-07-13 ((2457217j,0s,0n),+0s,2299161j)') }
+      { 'title' => '[FOR DISCUSSION ONLY] Remove Whitehall.case_study_preview_host', 'link' => 'https://github.com/alphagov/whitehall/pull/2266', 'author' => 'mattbostock', 'repo' => 'whitehall', 'comments_count' => '1', 'thumbs_up_count' => '0', 'updated' => Date.parse('2015-07-13 ((2457217j,0s,0n),+0s,2299161j)') }
     end
 
     let(:pull_requests) { [pull_request] }
@@ -161,7 +161,7 @@ describe MessageBuilder do
           'author' => 'sihugh>',
           'repo' => 'whitehall<',
           'comments_count' => '5',
-          'thumbs_up' => '0',
+          'thumbs_up_count' => '0',
           'updated' => Date.parse('2015-07-17 ((2457221j, 0s, 0n), +0s, 2299161j)'),
           'labels' => [
               { 'name' => 'wip' },
