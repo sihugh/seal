@@ -151,4 +151,28 @@ describe MessageBuilder do
       end
     end
   end
+
+  context 'with Slack incompatible text' do
+    let(:pull_requests) do
+      {
+        'Update library methods to work with Rails > 1 & < 5' => {
+          'title' => 'Update library methods to work with Rails > 1 & < 5',
+          'link' => 'https://github.com/alphagov/whitehall/pull/2248?something&something',
+          'author' => 'sihugh>',
+          'repo' => 'whitehall<',
+          'comments_count' => '5',
+          'thumbs_up' => '0',
+          'updated' => Date.parse('2015-07-17 ((2457221j, 0s, 0n), +0s, 2299161j)'),
+          'labels' => [
+              { 'name' => 'wip' },
+              { 'name' => 'blocked&pending' }
+            ]
+        }
+      }
+    end
+
+    it 'encodes characters as Slack would expect' do
+      expect(message_builder.build).to eq("Hello team! \n\n Here are the pull requests that need to be reviewed today:\n\n1) *whitehall&lt;* | sihugh&gt; | updated yesterday\n[wip] [blocked&amp;pending] <https://github.com/alphagov/whitehall/pull/2248?something&amp;something|Update library methods to work with Rails &gt; 1 &amp; &lt; 5> - 5 comments\n\nMerry reviewing!")
+    end
+  end
 end

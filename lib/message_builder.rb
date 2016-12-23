@@ -96,9 +96,15 @@ class MessageBuilder
     thumbs_up = ''
     thumbs_up = " | #{pr["thumbs_up"].to_i} :+1:" if pr["thumbs_up"].to_i > 0
     <<-EOF.gsub(/^\s+/, '')
-    #{index}\) *#{pr["repo"]}* | #{pr["author"]} | updated #{days_plural(days)}#{thumbs_up}
-    #{labels(pr)} <#{pr["link"]}|#{pr["title"]}> - #{pr["comments_count"]}#{comments(pull_request)}
+    #{index}\) *#{escape_for_slack(pr["repo"])}* | #{escape_for_slack(pr["author"])} | updated #{days_plural(days)}#{thumbs_up}
+    #{labels(pr)} <#{escape_for_slack(pr["link"])}|#{escape_for_slack(pr["title"])}> - #{pr["comments_count"]}#{comments(pull_request)}
     EOF
+  end
+
+  def escape_for_slack(text)
+    text.gsub("&", "&amp;")
+        .gsub("<", "&lt;")
+        .gsub(">", "&gt;")
   end
 
   def age_in_days(pull_request)
@@ -118,7 +124,7 @@ class MessageBuilder
 
   def labels(pull_request)
     pull_request['labels']
-      .map { |label| "[#{label['name']}]" }
+      .map { |label| "[#{escape_for_slack(label['name'])}]" }
       .join(' ')
   end
 end
