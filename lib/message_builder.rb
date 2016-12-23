@@ -1,3 +1,5 @@
+require 'pull_request_formatter'
+
 class MessageBuilder
 
   attr_accessor :pull_requests, :report, :mood, :poster_mood
@@ -48,16 +50,22 @@ class MessageBuilder
   end
 
   def bark_about_old_pull_requests
-    angry_bark = old_pull_requests.keys.each_with_index.map { |title, n| present(title, n + 1) }
+    angry_bark = old_pull_requests.keys.each_with_index.map do |title, n|
+      PullRequestFormatter.new(@content[title], n).present
+    end
     recent_pull_requests = @content.reject { |_title, pr| rotten?(pr) }
-    list_recent_pull_requests = recent_pull_requests.keys.each_with_index.map { |title, n| present(title, n + 1) }
+    list_recent_pull_requests = recent_pull_requests.keys.each_with_index.map do |title, n|
+      PullRequestFormatter.new(@content[title], n).present
+    end
     informative_bark = "There are also these pull requests that need to be reviewed today:\n\n#{list_recent_pull_requests.join} " if !recent_pull_requests.empty?
     "AAAAAAARGH! #{these(old_pull_requests.length)} #{pr_plural(old_pull_requests.length)} not been updated in over 2 days.\n\n#{angry_bark.join}\nRemember each time you forget to review your pull requests, a baby seal dies.
     \n\n#{informative_bark}"
   end
 
   def list_pull_requests
-    message = @content.keys.each_with_index.map { |title, n| present(title, n + 1) }
+    message = @content.keys.each_with_index.map do |title, n|
+      PullRequestFormatter.new(@content[title], n).present
+    end
     "Hello team! \n\n Here are the pull requests that need to be reviewed today:\n\n#{message.join}\nMerry reviewing!"
   end
 
@@ -67,11 +75,6 @@ class MessageBuilder
 
   def bark_about_quotes
     @content.sample
-  end
-
-  def comments(pr)
-    return "1 comment" if pr["comments_count"] == "1"
-    "#{pr["comments_count"]} comments"
   end
 
   def these(items)
@@ -88,73 +91,5 @@ class MessageBuilder
     else
       'pull requests have'
     end
-  end
-
-  def present(pull_request, index)
-    pr = @content[pull_request]
-
-    <<-EOF.gsub(/^\s+/, '')
-    #{index}\) *#{escaped_repo(pr)}* | #{escaped_author(pr)} | updated #{when_updated(pr)}#{thumbs_up(pr)}
-    #{labels(pr)} <#{escaped_link(pr)}|#{escaped_title(pr)}> - #{comments(pr)}
-    EOF
-  end
-
-  def when_updated(pr)
-    days_plural(age_in_days(pr))
-  end
-
-  def age_in_days(pull_request)
-    (Date.today - pull_request['updated']).to_i
-  end
-
-  def days_plural(days)
-    case days
-    when 0
-      'today'
-    when 1
-      "yesterday"
-    else
-      "#{days} days ago"
-    end
-  end
-
-  def labels(pull_request)
-    pull_request['labels']
-      .map { |label| "[#{escaped_label(label)}]" }
-      .join(' ')
-  end
-
-  def thumbs_up(pr)
-    if pr["thumbs_up"].to_i > 0
-      " | #{pr["thumbs_up"].to_i} :+1:"
-    else
-      ""
-    end
-  end
-
-  def escaped_author(pr)
-    escape_for_slack(pr["author"])
-  end
-
-  def escaped_label(label)
-    escape_for_slack(label['name'])
-  end
-
-  def escaped_link(pr)
-    escape_for_slack(pr["link"])
-  end
-
-  def escaped_repo(pr)
-    escape_for_slack(pr["repo"])
-  end
-
-  def escaped_title(pr)
-    escape_for_slack(pr["title"])
-  end
-
-  def escape_for_slack(text)
-    text.gsub("&", "&amp;")
-        .gsub("<", "&lt;")
-        .gsub(">", "&gt;")
   end
 end
