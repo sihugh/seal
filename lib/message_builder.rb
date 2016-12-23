@@ -2,7 +2,7 @@ require 'pull_request_formatter'
 
 class MessageBuilder
 
-  attr_accessor :pull_requests, :report, :mood, :poster_mood
+  attr_accessor :poster_mood
 
   def initialize(content, mode=nil)
     @content = content
@@ -50,23 +50,26 @@ class MessageBuilder
   end
 
   def bark_about_old_pull_requests
-    angry_bark = old_pull_requests.keys.each_with_index.map do |title, n|
-      PullRequestFormatter.new(@content[title], n).present
-    end
+    angry_bark = present(old_pull_requests)
+
     recent_pull_requests = @content.reject { |_title, pr| rotten?(pr) }
-    list_recent_pull_requests = recent_pull_requests.keys.each_with_index.map do |title, n|
-      PullRequestFormatter.new(@content[title], n).present
+
+    unless recent_pull_requests.empty?
+      list_recent_pull_requests = present(recent_pull_requests)
+      informative_bark = "There are also these pull requests that need to be reviewed today:\n\n#{list_recent_pull_requests.join} "
     end
-    informative_bark = "There are also these pull requests that need to be reviewed today:\n\n#{list_recent_pull_requests.join} " if !recent_pull_requests.empty?
+
     "AAAAAAARGH! #{these(old_pull_requests.length)} #{pr_plural(old_pull_requests.length)} not been updated in over 2 days.\n\n#{angry_bark.join}\nRemember each time you forget to review your pull requests, a baby seal dies.
     \n\n#{informative_bark}"
   end
 
   def list_pull_requests
-    message = @content.keys.each_with_index.map do |title, n|
-      PullRequestFormatter.new(@content[title], n).present
-    end
+    message = present(@content)
     "Hello team! \n\n Here are the pull requests that need to be reviewed today:\n\n#{message.join}\nMerry reviewing!"
+  end
+
+  def present(pull_requests)
+    pull_requests.keys.each_with_index.map { |title, n| PullRequestFormatter.new(@content[title], n).present }
   end
 
   def no_pull_requests
