@@ -3,7 +3,7 @@ ruby "2.2.0"
 
 gem 'slack-poster', '~> 1.0.1'
 gem "octokit", "~> 4.0"
-gem "sinatra"
+gem "sinatra", ">= 4.1.0"
 gem "thin"
 
 group :test do
