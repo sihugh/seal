@@ -7,8 +7,8 @@ gem "sinatra"
 gem "thin"
 
 group :test do
-  gem 'guard'
-  gem 'guard-rspec'
+  gem 'guard', '>= 2.14.0'
+  gem 'guard-rspec', '>= 4.6.5'
   gem 'jsonlint'
   gem 'rake'
   gem 'rspec'
